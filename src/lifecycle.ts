@@ -4,7 +4,7 @@ import { UpgradeInfo } from './types';
 import { Updater } from './updater';
 
 @LifecycleHookUnit()
-export default class TemplateLifecycle implements ApplicationLifecycle {
+export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
   @Inject()
   private readonly program: Program;
 

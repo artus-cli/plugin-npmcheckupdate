@@ -1,5 +1,6 @@
 import { Program, Inject, ApplicationLifecycle, LifecycleHook, LifecycleHookUnit, CommandContext, ArtusInjectEnum } from '@artus-cli/artus-cli';
 import DefaultConfig from './config/config.default';
+import { UpgradeInfo } from './types';
 import { Updater } from './updater';
 
 @LifecycleHookUnit()
@@ -28,14 +29,16 @@ export default class TemplateLifecycle implements ApplicationLifecycle {
         enableInterceptor = npmcheckupdate.enableInterceptor;
       }
 
+      let upgradeInfo: UpgradeInfo | undefined;
       if (enableInterceptor) {
-        const upgradeInfo = await this.updater.checkUpdate();
-        if (upgradeInfo) {
-          this.updater.displayUpgradeInfo(upgradeInfo);
-        }
+        upgradeInfo = await this.updater.checkUpdate();
       }
 
       await next();
+
+      if (upgradeInfo) {
+        this.updater.displayUpgradeInfo(upgradeInfo);
+      }
     });
   }
 }

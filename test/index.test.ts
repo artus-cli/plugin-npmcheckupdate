@@ -61,7 +61,7 @@ describe('test/index.test.ts', () => {
       .notExpect('stdout', /Update available/)
       .end();
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 10000));
 
     // expired
     await run('egg-bin', '-h', {

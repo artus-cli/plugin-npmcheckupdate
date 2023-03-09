@@ -2,6 +2,6 @@ import { NpmCheckUpdateConfig } from '../../../../src';
 
 export default {
   npmcheckupdate: {
-    checkInterval: '3s',
+    checkInterval: '5s',
   } satisfies NpmCheckUpdateConfig,
 };

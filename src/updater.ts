@@ -44,13 +44,13 @@ export class Updater {
     checkInterval = ms(checkInterval);
 
     const cacheInfo = await this.readCacheFile();
-    const lastUpdateTime = cacheInfo?.lastUpdateTime;
+    const lastUpdateTime = cacheInfo?.updateToDateTime;
     if (checkInterval > 0 && lastUpdateTime && (Date.now() - lastUpdateTime) < checkInterval) {
       // no need to check
       return undefined;
     }
 
-    const checkResult = checkUpdate({
+    const checkResult = await checkUpdate({
       unpkgUrl,
       upgradePolicy,
       pkgBaseDir: baseDir,
@@ -59,8 +59,8 @@ export class Updater {
     });
 
     // update cache
-    if (checkInterval > 0 && option.updateCache !== false) {
-      await this.updateCacheFile({ lastUpdateTime: Date.now() });
+    if (!checkResult.needUpdate && checkInterval > 0 && option.updateCache !== false) {
+      await this.updateCacheFile({ updateToDateTime: Date.now() });
     }
 
     return checkResult;

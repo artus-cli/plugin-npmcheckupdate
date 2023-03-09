@@ -36,7 +36,7 @@ export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
 
       await next();
 
-      if (upgradeInfo) {
+      if (upgradeInfo?.needUpdate) {
         this.updater.displayUpgradeInfo(upgradeInfo);
       }
     });

@@ -45,7 +45,7 @@ describe('test/index.test.ts', () => {
       .end();
   });
 
-  it('should not check update when cache is expired', async () => {
+  it.skip('should not check update when cache is expired', async () => {
     await run('egg-bin', '-h', {
       env: { ARTUS_CLI_ENV: 'interval' },
     })

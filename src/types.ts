@@ -7,7 +7,7 @@ export interface NpmCheckUpdateConfig {
   unpkgUrl?: string;
   /** the file be used to cache last update info */
   cacheFile?: string;
-  /** check inerval with local cache, default is 0, means no cache */
+  /** check inerval with local cache, default is 1 day */
   checkInterval?: string | number;
   /** upgrade policy, canbe major/minor/patch or dist-tags, default is latest */
   upgradePolicy?: 'major' | 'minor' | 'patch' | DistTag;
@@ -16,7 +16,7 @@ export interface NpmCheckUpdateConfig {
 }
 
 export interface CacheInfo {
-  lastUpdateTime?: number;
+  updateToDateTime?: number;
 }
 
 export interface UpgradeInfo {
@@ -26,4 +26,5 @@ export interface UpgradeInfo {
   distTag: DistTag;
   upgradePolicy: NpmCheckUpdateConfig['upgradePolicy'];
   targetVersion: string;
+  needUpdate: boolean;
 }

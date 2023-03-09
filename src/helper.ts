@@ -45,18 +45,15 @@ export async function checkUpdate(option: Pick<NpmCheckUpdateConfig, 'unpkgUrl' 
 
   // check whether need to update
   const result = semver.compare(remoteVersion, pkgVersion);
-  if (result > 0) {
-    return {
-      distTag,
-      upgradePolicy,
-      pkgName,
-      pkgVersion,
-      pkgBaseDir,
-      targetVersion: remoteVersion,
-    };
-  }
-
-  return undefined;
+  return {
+    distTag,
+    upgradePolicy,
+    pkgName,
+    pkgVersion,
+    pkgBaseDir,
+    targetVersion: remoteVersion,
+    needUpdate: result > 0,
+  };
 }
 
 export function displayUpgradeInfo(upgradeInfo: UpgradeInfo) {

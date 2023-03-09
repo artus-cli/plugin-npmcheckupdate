@@ -39,18 +39,14 @@ export class Updater {
   }
 
   async checkUpdate(option: { updateCache?: boolean; } = {}) {
-    let { checkInterval, unpkgUrl, upgradePolicy, cacheFile } = this.config.npmcheckupdate;
+    let { checkInterval, unpkgUrl, upgradePolicy } = this.config.npmcheckupdate;
     const { baseDir, version, binInfo } = this.program;
-
-    if (!cacheFile) {
-      cacheFile = path.resolve(baseDir, './.npmcheckupdate');
-    }
+    checkInterval = ms(checkInterval);
 
     const cacheInfo = await this.readCacheFile();
     const lastUpdateTime = cacheInfo?.lastUpdateTime;
-
-    // no need to update
-    if (lastUpdateTime && (Date.now() - lastUpdateTime) < ms(checkInterval)) {
+    if (checkInterval > 0 && lastUpdateTime && (Date.now() - lastUpdateTime) < checkInterval) {
+      // no need to check
       return undefined;
     }
 
@@ -63,7 +59,7 @@ export class Updater {
     });
 
     // update cache
-    if (option.updateCache !== false) {
+    if (checkInterval > 0 && option.updateCache !== false) {
       await this.updateCacheFile({ lastUpdateTime: Date.now() });
     }
 

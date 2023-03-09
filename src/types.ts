@@ -7,8 +7,8 @@ export interface NpmCheckUpdateConfig {
   unpkgUrl?: string;
   /** the file be used to cache last update info */
   cacheFile?: string;
-  /** check inerval, default is 1 day */
-  checkInterval?: string;
+  /** check inerval with local cache, default is 0, means no cache */
+  checkInterval?: string | number;
   /** upgrade policy, canbe major/minor/patch or dist-tags, default is latest */
   upgradePolicy?: 'major' | 'minor' | 'patch' | DistTag;
   /** whether enable intercept in all command? default is true */

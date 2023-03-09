@@ -1,21 +1,19 @@
-# artus-cli/template
+# artus-cli/plugin-npmcheckupdate
 
-template repository for artus-cli
+A artus-cli plugin be used to display upgrade info
 
-<!-- Badge，自行替换掉下面的 `artus-cli/artus-cli` 占位符-->
-
-[![NPM version](https://img.shields.io/npm/v/@artus-cli/artus-cli.svg?style=flat-square)](https://npmjs.org/package/@artus-cli/artus-cli)
-[![NPM quality](https://img.shields.io/npms-io/final-score/@artus-cli/artus-cli.svg?style=flat-square)](https://npmjs.org/package/@artus-cli/artus-cli)
-[![NPM download](https://img.shields.io/npm/dm/@artus-cli/artus-cli.svg?style=flat-square)](https://npmjs.org/package/@artus-cli/artus-cli)
-[![Continuous Integration](https://github.com/artus-cli/artus-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/artus-cli/artus-cli/actions/workflows/ci.yml)
-[![Test coverage](https://img.shields.io/codecov/c/github/artus-cli/artus-cli.svg?style=flat-square)](https://codecov.io/gh/artus-cli/artus-cli)
-[![Oss Insight Analytics](https://img.shields.io/badge/OssInsight-artus--cli%2Fartus--cli-blue.svg?style=flat-square)](https://ossinsight.io/analyze/artus-cli/artus-cli)
+[![NPM version](https://img.shields.io/npm/v/@artus-cli/plugin-npmcheckupdate.svg?style=flat-square)](https://npmjs.org/package/@artus-cli/plugin-npmcheckupdate)
+[![NPM quality](https://img.shields.io/npms-io/final-score/@artus-cli/plugin-npmcheckupdate.svg?style=flat-square)](https://npmjs.org/package/@artus-cli/plugin-npmcheckupdate)
+[![NPM download](https://img.shields.io/npm/dm/@artus-cli/plugin-npmcheckupdate.svg?style=flat-square)](https://npmjs.org/package/@artus-cli/plugin-npmcheckupdate)
+[![Continuous Integration](https://github.com/artus-cli/plugin-npmcheckupdate/actions/workflows/ci.yml/badge.svg)](https://github.com/artus-cli/plugin-npmcheckupdate/actions/workflows/ci.yml)
+[![Test coverage](https://img.shields.io/codecov/c/github/artus-cli/plugin-npmcheckupdate.svg?style=flat-square)](https://codecov.io/gh/artus-cli/plugin-npmcheckupdate)
+[![Oss Insight Analytics](https://img.shields.io/badge/OssInsight-artus--cli%2Fartus--cli-blue.svg?style=flat-square)](https://ossinsight.io/analyze/artus-cli/plugin-npmcheckupdate)
 
 
 ## Install
 
 ```sh
-$ npm i -D @artus-cli/artus-cli 
+$ npm i -D @artus-cli/plugin-npmcheckupdate 
 ```
 
 ## Usage
@@ -26,22 +24,24 @@ $ npm i -D @artus-cli/artus-cli
 export default {
   template: {
     enable: true,
-    package: 'artus-cli/artus-cli',
+    package: 'artus-cli/plugin-npmcheckupdate',
   },
 };
 ```
 
-## Commands
+## Configuration
 
-### dev
-
-
-### debug
-
-
-## Contributing
-
-```sh
-$ npm test
-$ npm run cov
+```ts
+export interface NpmCheckUpdateConfig {
+  /** unpkg url, default is https://unpkg.com/ */
+  unpkgUrl?: string;
+  /** the file be used to cache last update info */
+  cacheFile?: string;
+  /** check inerval with local cache, default is 0, means no cache */
+  checkInterval?: string | number;
+  /** upgrade policy, canbe major/minor/patch or dist-tags, default is latest */
+  upgradePolicy?: 'major' | 'minor' | 'patch' | DistTag;
+  /** whether enable intercept in all command? default is true */
+  enableInterceptor?: boolean | ((cmd: typeof Command) => boolean);
+}
 ```

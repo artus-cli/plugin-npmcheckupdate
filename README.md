@@ -13,7 +13,7 @@ A artus-cli plugin be used to display upgrade info
 ## Install
 
 ```sh
-$ npm i -D @artus-cli/plugin-npmcheckupdate 
+$ npm i @artus-cli/plugin-npmcheckupdate 
 ```
 
 ## Usage
@@ -22,9 +22,9 @@ $ npm i -D @artus-cli/plugin-npmcheckupdate
 // plugin.ts
 
 export default {
-  template: {
+  npmcheckupdate: {
     enable: true,
-    package: 'artus-cli/plugin-npmcheckupdate',
+    package: '@artus-cli/plugin-npmcheckupdate',
   },
 };
 ```

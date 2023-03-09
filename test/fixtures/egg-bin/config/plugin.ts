@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 export default {
-  template: {
+  npmcheckupdate: {
     enable: true,
     path: path.resolve(__dirname, '../../../../src'),
   },

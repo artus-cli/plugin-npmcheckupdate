@@ -13,6 +13,8 @@ export interface NpmCheckUpdateConfig {
   upgradePolicy?: 'major' | 'minor' | 'patch' | DistTag;
   /** whether enable intercept in all command? default is true */
   enableInterceptor?: boolean | ((cmd: typeof Command) => boolean);
+  /** the position of upgrade info, default is after */
+  upgradeInfoPrintPosition?: 'before' | 'after';
 }
 
 export interface CacheInfo {

@@ -1,6 +1,7 @@
 import { run } from './test-utils';
 import rimraf from 'rimraf';
 import path from 'path';
+import assert from 'assert';
 
 describe('test/index.test.ts', () => {
   beforeEach(async () => {
@@ -93,5 +94,31 @@ describe('test/index.test.ts', () => {
       .debug()
       .notExpect('stdout', /Update available/)
       .end();
+  });
+
+  it('should change upgade info display position without error', async () => {
+    // should after
+    const { stdout } = await run('egg-bin', '-h')
+      // .debug()
+      .expect('stdout', /Update available/)
+      .end();
+
+    const stdoutList = stdout.split(/\r?\n/);
+    const updateAvailableIndex = stdoutList.findIndex(s => s.includes('Update available'));
+    const usageIndex = stdoutList.findIndex(s => s.includes('Usage: egg-bin'));
+    assert(updateAvailableIndex > usageIndex);
+
+    // should before
+    const { stdout: stdout2 } = await run('egg-bin', '-h', {
+      env: { ARTUS_CLI_ENV: 'position' },
+    })
+      // .debug()
+      .expect('stdout', /Update available/)
+      .end();
+
+    const stdoutList2 = stdout2.split(/\r?\n/);
+    const updateAvailableIndex2 = stdoutList2.findIndex(s => s.includes('Update available'));
+    const usageIndex2 = stdoutList2.findIndex(s => s.includes('Usage: egg-bin'));
+    assert(updateAvailableIndex2 < usageIndex2);
   });
 });

@@ -1,6 +1,5 @@
 import { Program, Inject, ApplicationLifecycle, LifecycleHook, LifecycleHookUnit, CommandContext, ArtusInjectEnum } from '@artus-cli/artus-cli';
 import DefaultConfig from './config/config.default';
-import { UpgradeInfo } from './types';
 import { Updater } from './updater';
 
 @LifecycleHookUnit()
@@ -21,7 +20,7 @@ export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
       return;
     }
 
-    this.program.use(async (ctx: CommandContext, next) => {
+    const displayUpgradeInfo = async (ctx: CommandContext) => {
       let enableInterceptor = false;
       if (typeof npmcheckupdate.enableInterceptor === 'function') {
         enableInterceptor = ctx.matched ? npmcheckupdate.enableInterceptor(ctx.matched.clz) : false;
@@ -29,15 +28,25 @@ export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
         enableInterceptor = npmcheckupdate.enableInterceptor;
       }
 
-      let upgradeInfo: UpgradeInfo | undefined;
-      if (enableInterceptor) {
-        upgradeInfo = await this.updater.checkUpdate();
+      if (!enableInterceptor) {
+        return;
+      }
+
+      const upgradeInfo = await this.updater.checkUpdate();
+      if (upgradeInfo?.needUpdate) {
+        this.updater.displayUpgradeInfo(upgradeInfo);
+      }
+    };
+
+    this.program.use(async (ctx: CommandContext, next) => {
+      if (npmcheckupdate.upgradeInfoPrintPosition === 'before') {
+        await displayUpgradeInfo(ctx);
       }
 
       await next();
 
-      if (upgradeInfo?.needUpdate) {
-        this.updater.displayUpgradeInfo(upgradeInfo);
+      if (npmcheckupdate.upgradeInfoPrintPosition === 'after') {
+        await displayUpgradeInfo(ctx);
       }
     });
   }

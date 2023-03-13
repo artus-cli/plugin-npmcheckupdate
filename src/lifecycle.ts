@@ -20,9 +20,7 @@ export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
       return;
     }
 
-    this.program.use(async (ctx: CommandContext, next) => {
-      await next();
-
+    const displayUpgradeInfo = async (ctx: CommandContext) => {
       let enableInterceptor = false;
       if (typeof npmcheckupdate.enableInterceptor === 'function') {
         enableInterceptor = ctx.matched ? npmcheckupdate.enableInterceptor(ctx.matched.clz) : false;
@@ -37,6 +35,18 @@ export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
       const upgradeInfo = await this.updater.checkUpdate();
       if (upgradeInfo?.needUpdate) {
         this.updater.displayUpgradeInfo(upgradeInfo);
+      }
+    };
+
+    this.program.use(async (ctx: CommandContext, next) => {
+      if (npmcheckupdate.upgradeInfoPrintPosition === 'before') {
+        await displayUpgradeInfo(ctx);
+      }
+
+      await next();
+
+      if (npmcheckupdate.upgradeInfoPrintPosition === 'after') {
+        await displayUpgradeInfo(ctx);
       }
     });
   }

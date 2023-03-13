@@ -6,5 +6,6 @@ export default {
     checkInterval: '1d',
     upgradePolicy: 'latest',
     enableInterceptor: true,
+    upgradeInfoPrintPosition: 'after',
   } as NpmCheckUpdateConfig,
 };

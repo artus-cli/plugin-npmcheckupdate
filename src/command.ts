@@ -5,7 +5,7 @@ import { Updater } from './updater';
 @DefineCommand({
   enable: false,
   command: '$0 checkupdate [disttag]',
-  description: 'Check whether need to update',
+  description: 'Check if need to updated',
 })
 export class CheckUpdateCommand extends Command {
   @Option()

@@ -40,14 +40,14 @@ export class Updater {
     return fs.writeFile(this.cacheFile, JSON.stringify(updateInfo));
   }
 
-  async checkUpdate(option: Partial<NpmCheckUpdateConfig> & { updateCache?: boolean; } = {}): Promise<UpgradeInfo | undefined> {
+  async checkUpdate(option: Partial<NpmCheckUpdateConfig> & { checkCache?: boolean; } = {}): Promise<UpgradeInfo | undefined> {
     if (this.checked) {
       // avoid checking twice
       return undefined;
     }
 
     this.checked = true;
-    let { checkInterval, unpkgUrl, upgradePolicy, updateCache } = {
+    let { checkInterval, unpkgUrl, upgradePolicy, checkCache } = {
       ...this.config.npmcheckupdate,
       ...option,
     };
@@ -57,7 +57,7 @@ export class Updater {
 
     const cacheInfo = await this.readCacheFile();
     const lastUpdateTime = cacheInfo?.updateToDateTime;
-    if (checkInterval > 0 && lastUpdateTime && (Date.now() - lastUpdateTime) < checkInterval) {
+    if (checkCache !== false && checkInterval > 0 && lastUpdateTime && (Date.now() - lastUpdateTime) < checkInterval) {
       // no need to check
       return undefined;
     }
@@ -71,7 +71,7 @@ export class Updater {
     });
 
     // update cache
-    if (!checkResult.needUpdate && checkInterval > 0 && updateCache !== false) {
+    if (!checkResult.needUpdate && checkInterval > 0 && checkCache !== false) {
       await this.updateCacheFile({ updateToDateTime: Date.now() });
     }
 

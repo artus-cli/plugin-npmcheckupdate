@@ -23,7 +23,7 @@ export class CheckUpdateCommand extends Command {
 
     const result = await this.updater.checkUpdate({
       upgradePolicy: policy,
-      updateCache: false,
+      checkCache: false,
     });
 
     if (!result?.needUpdate) {

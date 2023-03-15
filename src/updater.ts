@@ -2,7 +2,7 @@ import { Inject, Injectable, Program, ArtusInjectEnum, ScopeEnum } from '@artus-
 import DefaultConfig from './config/config.default';
 import path from 'path';
 import ms from 'ms';
-import { CacheInfo, UpgradeInfo } from './types';
+import { CacheInfo, NpmCheckUpdateConfig, UpgradeInfo } from './types';
 import fs from 'fs/promises';
 import { checkUpdate, displayUpgradeInfo } from './helper';
 const cacheFileSym = Symbol('cacheFile');
@@ -16,6 +16,8 @@ export class Updater {
 
   @Inject(ArtusInjectEnum.Config)
   config: typeof DefaultConfig;
+
+  private checked?: boolean;
 
   private get cacheFile() {
     if (this[cacheFileSym]) {
@@ -38,8 +40,18 @@ export class Updater {
     return fs.writeFile(this.cacheFile, JSON.stringify(updateInfo));
   }
 
-  async checkUpdate(option: { updateCache?: boolean; } = {}) {
-    let { checkInterval, unpkgUrl, upgradePolicy } = this.config.npmcheckupdate;
+  async checkUpdate(option: Partial<NpmCheckUpdateConfig> & { updateCache?: boolean; } = {}) {
+    if (this.checked) {
+      // avoid checking twice
+      return undefined;
+    }
+
+    this.checked = true;
+    let { checkInterval, unpkgUrl, upgradePolicy, updateCache } = {
+      ...this.config.npmcheckupdate,
+      ...option,
+    };
+
     const { baseDir, version, binInfo } = this.program;
     checkInterval = ms(checkInterval);
 
@@ -59,7 +71,7 @@ export class Updater {
     });
 
     // update cache
-    if (!checkResult.needUpdate && checkInterval > 0 && option.updateCache !== false) {
+    if (!checkResult.needUpdate && checkInterval > 0 && updateCache !== false) {
       await this.updateCacheFile({ updateToDateTime: Date.now() });
     }
 
@@ -68,6 +80,6 @@ export class Updater {
 
   /** display upgrade info */
   displayUpgradeInfo(upgradeInfo: UpgradeInfo) {
-    return displayUpgradeInfo(upgradeInfo);
+    return displayUpgradeInfo(upgradeInfo, this.config.npmcheckupdate.upgradeInfoHooks);
   }
 }

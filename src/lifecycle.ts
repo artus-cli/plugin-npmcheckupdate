@@ -1,6 +1,7 @@
 import { Program, Inject, ApplicationLifecycle, LifecycleHook, LifecycleHookUnit, CommandContext, ArtusInjectEnum } from '@artus-cli/artus-cli';
 import DefaultConfig from './config/config.default';
 import { Updater } from './updater';
+import { CheckUpdateCommand } from './command';
 
 @LifecycleHookUnit()
 export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
@@ -18,6 +19,11 @@ export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
     const { npmcheckupdate } = this.config;
     if (!npmcheckupdate.enableInterceptor) {
       return;
+    }
+
+    // enable CheckUpdateCommand dynamically
+    if (npmcheckupdate.enableCommand) {
+      this.program.enableCommand(CheckUpdateCommand);
     }
 
     const displayUpgradeInfo = async (ctx: CommandContext) => {

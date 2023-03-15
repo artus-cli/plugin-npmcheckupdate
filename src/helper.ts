@@ -40,11 +40,13 @@ export async function checkUpdate(option: Pick<NpmCheckUpdateConfig, 'unpkgUrl' 
     remoteVersion = data.version;
   } catch(e) {
     helperDebug(`Request ${remoteUrl} failed with error: ` + e.message);
-    return undefined;
   }
 
   // check whether need to update
-  const result = semver.compare(remoteVersion, pkgVersion);
+  const result = remoteVersion
+    ? semver.compare(remoteVersion, pkgVersion)
+    : -1;
+
   return {
     distTag,
     upgradePolicy,
@@ -56,35 +58,61 @@ export async function checkUpdate(option: Pick<NpmCheckUpdateConfig, 'unpkgUrl' 
   };
 }
 
-export function displayUpgradeInfo(upgradeInfo: UpgradeInfo) {
+export function displayUpgradeInfo(
+  upgradeInfo: UpgradeInfo,
+  upgradeInfoHooks?: NpmCheckUpdateConfig['upgradeInfoHooks'],
+) {
   // update contents
-  const contents = [
+  let contents = [
     `Update available ${chalk.gray(upgradeInfo.pkgVersion)} → ${chalk.greenBright(upgradeInfo.targetVersion)}`,
     `Run ${chalk.blueBright(`npm i -g ${upgradeInfo.pkgName}@${upgradeInfo.distTag || upgradeInfo.targetVersion}`)} to update`,
   ];
 
+  if (upgradeInfoHooks && upgradeInfoHooks.contents) {
+    const result = upgradeInfoHooks.contents(upgradeInfo, contents);
+    contents = Array.isArray(result) ? result : result.split(/\r?\n/);
+  }
+
+  const minWidth = 40;
+  const padding = 3;
   const removeColor = c => c.replace(/\x1B\[\d+m/g, '');
-  const maxLen = contents.map(removeColor)
-    .sort((a, b) => a.length - b.length)
-    .pop().length;
+  const len = (c: string) => c.split('')
+    .map(c => (c.match(/[\u4e00-\u9fa5]/) ? 2 : 1))
+    .reduce((a, b) => a + b as any);
+
+  let contentMaxWidth = contents.map(removeColor)
+    .map(a => len(a))
+    .sort((a, b) => a - b)
+    .pop();
+  
+  if (contentMaxWidth < minWidth) {
+    contentMaxWidth = minWidth;
+  }
 
   // show content
-  const distanceLen = 2;
-  const displayContents: string[] = [];
-  const contentLen = maxLen + distanceLen * 2;
-  displayContents.push('┌' + '─'.repeat(contentLen) + '┐');
-  displayContents.push('│' + ' '.repeat(contentLen) + '│');
-  displayContents.push('│' + ' '.repeat(contentLen) + '│');
+  let fullContents: string[] = [];
+  const contentWidth = contentMaxWidth + padding * 2;
+
+  fullContents.push(chalk.yellowBright('╭' + '─'.repeat(contentWidth) + '╮'));
+  fullContents.push(chalk.yellowBright('│' + ' '.repeat(contentWidth) + '│'));
+  fullContents.push(chalk.yellowBright('│' + ' '.repeat(contentWidth) + '│'));
 
   contents.forEach(c => {
-    const realContentLen = removeColor(c).length;
-    const leftSpace = ' '.repeat(distanceLen + (maxLen - realContentLen) / 2);
-    const rightSpace = ' '.repeat(contentLen - leftSpace.length - realContentLen);
-    displayContents.push('│' + leftSpace + c + rightSpace + '│');
+    const realContentWidth = len(removeColor(c));
+    const leftSpace = ' '.repeat(padding + (contentMaxWidth - realContentWidth) / 2);
+    const rightSpace = ' '.repeat(contentWidth - leftSpace.length - realContentWidth);
+    fullContents.push(chalk.yellowBright('│') + leftSpace + c + rightSpace + chalk.yellowBright('│'));
   });
 
-  displayContents.push('│' + ' '.repeat(contentLen) + '│');
-  displayContents.push('│' + ' '.repeat(contentLen) + '│');
-  displayContents.push('└' + '─'.repeat(contentLen) + '┘');
-  console.info(`\n\n${displayContents.map(c => `  ${c}`).join('\n')}\n\n`);
+  fullContents.push(chalk.yellowBright('│' + ' '.repeat(contentWidth) + '│'));
+  fullContents.push(chalk.yellowBright('│' + ' '.repeat(contentWidth) + '│'));
+  fullContents.push(chalk.yellowBright('╰' + '─'.repeat(contentWidth) + '╯'));
+  fullContents = fullContents.map(c => `  ${c}`);
+
+  if (upgradeInfoHooks && upgradeInfoHooks.fullContents) {
+    const result = upgradeInfoHooks.fullContents(upgradeInfo, fullContents);
+    fullContents = Array.isArray(result) ? result : result.split(/\r?\n/);
+  }
+
+  console.info(`\n\n${fullContents.join('\n')}\n\n`);
 }

@@ -121,4 +121,72 @@ describe('test/index.test.ts', () => {
     const usageIndex2 = stdoutList2.findIndex(s => s.includes('Usage: egg-bin'));
     assert(updateAvailableIndex2 < usageIndex2);
   });
+
+  it('should check update manually', async () => {
+    const { stdout } = await run('egg-bin', 'checkupdate')
+      // .debug()
+      .expect('stdout', /Update available/)
+      .end();
+
+    const list = stdout.split(/\r?\n/).filter(s => s.includes('Update available'));
+    assert(list.length === 1);
+
+    // disttag
+    await run('egg-bin', [ 'checkupdate', 'patch' ])
+      // .debug()
+      .expect('stdout', /Update available 1.0.0 → 1.0.\d+/)
+      .end();
+
+    // unknown disttag
+    await run('egg-bin', [ 'checkupdate', 'asd' ])
+      // .debug()
+      .expect('stdout', /Unknown dist-tag: asd, please check and try again/)
+      .end();
+
+    // disable command
+    await run('egg-bin', 'checkupdate', {
+      env: { ARTUS_CLI_ENV: 'command' },
+    })
+      // .debug()
+      .expect('stderr', /Command is not found: 'egg-bin checkupdate'/)
+      .end();
+  });
+
+  it('should customize upgrade info', async () => {
+    await run('egg-bin', 'checkupdate', {
+      env: { ARTUS_CLI_ENV: 'hook', CONTENTS: 'true' },
+    })
+      .debug()
+      .expect('stdout', /Update available/)
+      .expect('stdout', /Changelog: http\:\/\/666/)
+      .end();
+
+    // return str
+    await run('egg-bin', 'checkupdate', {
+      env: { ARTUS_CLI_ENV: 'hook', CONTENTS_STR: 'true' },
+    })
+      // .debug()
+      .expect('stdout', /│                    12345                     │/)
+      .expect('stdout', /│                  上山打老虎                  │/)
+      .end();
+
+    // return full contents
+    await run('egg-bin', 'checkupdate', {
+      env: { ARTUS_CLI_ENV: 'hook', FULL_CONTENTS: 'true' },
+    })
+      // .debug()
+      .expect('stdout', /Update available/)
+      .expect('stdout', /666/)
+      .end();
+
+    // return full contents with str
+    await run('egg-bin', 'checkupdate', {
+      env: { ARTUS_CLI_ENV: 'hook', FULL_CONTENTS_STR: 'true' },
+    })
+      // .debug()
+      .notExpect('stdout', /Update available/)
+      .expect('stdout', /12345/)
+      .expect('stdout', /老铁双击 666/)
+      .end();
+  });
 });

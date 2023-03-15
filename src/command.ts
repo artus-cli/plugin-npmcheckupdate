@@ -26,14 +26,16 @@ export class CheckUpdateCommand extends Command {
       updateCache: false,
     });
 
-    if (!result.needUpdate) {
-      if (!result.targetVersion) {
+    if (!result?.needUpdate) {
+      if (!result?.targetVersion) {
         return console.info(`Unknown dist-tag: ${policy}, please check and try again.`);
       }
 
       return console.info('Already up to date.');
     }
 
-    this.updater.displayUpgradeInfo(result);
+    if (result) {
+      this.updater.displayUpgradeInfo(result);
+    }
   }
 }

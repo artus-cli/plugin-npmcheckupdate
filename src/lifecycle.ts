@@ -31,7 +31,7 @@ export default class NpmCheckUpdateLifecycle implements ApplicationLifecycle {
       if (typeof npmcheckupdate.enableInterceptor === 'function') {
         enableInterceptor = ctx.matched ? npmcheckupdate.enableInterceptor(ctx.matched.clz) : false;
       } else {
-        enableInterceptor = npmcheckupdate.enableInterceptor;
+        enableInterceptor = !!npmcheckupdate.enableInterceptor;
       }
 
       if (!enableInterceptor) {

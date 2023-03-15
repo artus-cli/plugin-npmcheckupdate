@@ -25,6 +25,7 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "dependencies": {
+    "@types/ms": "^0.7.31",
     "chalk": "^4.1.2",
     "debug": "^4.3.4",
     "ms": "^2.1.3",

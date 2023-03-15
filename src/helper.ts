@@ -24,12 +24,12 @@ export async function checkUpdate(option: Pick<NpmCheckUpdateConfig, 'unpkgUrl' 
     remoteVersionPatterns = `${major}.${minor}.*`;
   } else {
     distTag = upgradePolicy;
-    remoteVersionPatterns = upgradePolicy;
+    remoteVersionPatterns = upgradePolicy!;
   }
 
   // request unpkg to get version info
-  let remoteVersion: string;
-  const unpkgHost = unpkgUrl.endsWith('/') ? unpkgUrl : `${unpkgUrl}/`;
+  let remoteVersion: string | undefined;
+  const unpkgHost = unpkgUrl!.endsWith('/') ? unpkgUrl : `${unpkgUrl}/`;
   const remoteUrl = `${unpkgHost}${pkgName}@${remoteVersionPatterns}/package.json`;
   try {
     const { data } = await urllib.request(remoteUrl, {
@@ -83,7 +83,7 @@ export function displayUpgradeInfo(
   let contentMaxWidth = contents.map(removeColor)
     .map(a => len(a))
     .sort((a, b) => a - b)
-    .pop();
+    .pop()!;
   
   if (contentMaxWidth < minWidth) {
     contentMaxWidth = minWidth;

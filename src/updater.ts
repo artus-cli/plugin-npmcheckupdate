@@ -40,7 +40,7 @@ export class Updater {
     return fs.writeFile(this.cacheFile, JSON.stringify(updateInfo));
   }
 
-  async checkUpdate(option: Partial<NpmCheckUpdateConfig> & { updateCache?: boolean; } = {}) {
+  async checkUpdate(option: Partial<NpmCheckUpdateConfig> & { updateCache?: boolean; } = {}): Promise<UpgradeInfo | undefined> {
     if (this.checked) {
       // avoid checking twice
       return undefined;
@@ -53,7 +53,7 @@ export class Updater {
     };
 
     const { baseDir, version, binInfo } = this.program;
-    checkInterval = ms(checkInterval);
+    checkInterval = ms(checkInterval as string);
 
     const cacheInfo = await this.readCacheFile();
     const lastUpdateTime = cacheInfo?.updateToDateTime;
@@ -75,7 +75,7 @@ export class Updater {
       await this.updateCacheFile({ updateToDateTime: Date.now() });
     }
 
-    return checkResult;
+    return checkResult as UpgradeInfo;
   }
 
   /** display upgrade info */

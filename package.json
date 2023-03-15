@@ -1,6 +1,6 @@
 {
   "name": "@artus-cli/plugin-npmcheckupdate",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A artus-cli plugin be used to display upgrade info",
   "homepage": "",
   "author": "whxaxes <whxaxes@gmail.com>",
